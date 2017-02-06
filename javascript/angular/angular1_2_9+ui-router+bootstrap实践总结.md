@@ -1,15 +1,33 @@
-1. 一个外部函数返回一个内部函数，
-并且内部函数内部引用了外部函数的变量，
-当调用外部函数时，返回的内部函数和其所引用的局部变量形成闭包。
+> ui-router加载模板文件后解析编译内部script引入文件
 
-2. 闭包用于封装私有变量
+使用angular装饰器装饰 uiViewDirective 指令，加入ui-router-require-polyfill.js
+<a href="https://github.com/kuitos/angular-utils/blob/1.3.1/polyfills/ui-router-require-polyfill.js" target="_blank">参考</a>
 
-3. 函数作用域链在其创建的时候就形成了。 所以下面f1函数中b函数的作用域链依次为 b的活动对象>f1>全局
+> 正则表达式匹配页面中的script标签src信息
+
+上述ui-router-require-polyfill.js中有一个获取script标签的正则表达式，如下
+
+`/<script\s+((?!type=('|")text\/ng-template('|")).)*>.*<\/script>/gi`
+
+此正则表达式在ie8中只会匹配到最后一个script，需改成如下即可：
+
+`/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi`
+
+> angular中使用调用jquery插件
+
+设置自定义angular指令（如下），在对应html标签上添加指令属性即可
+
 ```
-function f1(){
-    var a = 1;
-    b = function(){
-        a+=1;
-    };
-}
+.directive('myDatepicker', function() {
+            return {
+                // Restrict it to be an attribute in this case
+                restrict: 'A',
+                // responsible for registering DOM listeners as well as updating the DOM
+                link: function (scope, element, attrs) {
+                    $(element).datepicker();
+                }
+            }
+        })
 ```
+
+> 未完待续。。。
